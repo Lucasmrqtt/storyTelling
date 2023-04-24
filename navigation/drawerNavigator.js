@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component} from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import TabNavigator from "./tabNavigator";
 import Profile from "../screens/Profile";

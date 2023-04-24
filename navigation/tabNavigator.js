@@ -1,10 +1,11 @@
-import React from "react";
+import React, {Component} from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import Feed from "../screens/feed";
 import CreateStory from "../screens/createStory";
 import Ionicons from "react-native-vector-icons/Ionicons"
 
-const Tab = createBottomTabNavigator()
+const Tab = createMaterialBottomTabNavigator()
 
 export default class TabNavigator extends Component {
   render() {
