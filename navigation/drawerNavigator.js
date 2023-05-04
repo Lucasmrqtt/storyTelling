@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import TabNavigator from "./tabNavigator";
+import StackNavigator from "./stackNavigator";
 import Profile from "../screens/Profile";
 
 const Drawer = createDrawerNavigator()
@@ -9,7 +9,7 @@ export default class DrawerNavigator extends Component {
   render() {
     return (
       <Drawer.Navigator>
-        <Drawer.Screen name="Home" component={TabNavigator} />
+        <Drawer.Screen name="Home" component={StackNavigator} />
         <Drawer.Screen name="Profile" component={Profile} />
       </Drawer.Navigator>
     )

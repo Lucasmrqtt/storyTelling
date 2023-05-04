@@ -25,7 +25,7 @@ export default class TabNavigator extends Component {
             } else if (route.name === 'Create Story') {
               iconName = focused ? 'create' : 'create-outline';
             }
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <Ionicons name={iconName} size={20} color={color} style={styles.icons}/>;
           },
         })}
         activeColor={"#ee8249"}
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     position: "absolute"
   },
   icons: {
-    width: RFValue(30),
-    height: RFValue(30)
+    width: RFValue(15),
+    height: RFValue(15)
   }
 });

@@ -58,7 +58,7 @@ export default class CreateStory extends Component {
             <Image source={preview_Image[this.state.previewImage]} style={styles.previewImage} />
             <View style={{ height: RFValue(this.state.dropDownHeight) }}>
               <DropDownPicker
-                itens={[
+                items={[
                   { label: "Image_1", value: "Image_1" },
                   { label: "Image_2", value: "Image_2" },
                   { label: "Image_3", value: "Image_3" },
