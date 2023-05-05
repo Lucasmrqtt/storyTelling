@@ -5,6 +5,7 @@ import *as Font from "expo-font"
 import *as SplashScreen from "expo-splash-screen"
 import { RFValue } from "react-native-responsive-fontsize";
 import StoryCard from "./storyCard";
+import { Button } from "react-native-paper";
 
 SplashScreen.preventAutoHideAsync()
 
