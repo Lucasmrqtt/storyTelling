@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, StyleSheet, SafeAreaView, Platform, StatusBar, Image, TextInput, Alert, TouchableOpacity, Text, KeyboardAvoidingView} from "react-native";
+import { View, StyleSheet, SafeAreaView, Platform, StatusBar, Image, TextInput, Alert, TouchableOpacity, Text, KeyboardAvoidingView } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import * as Font from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
@@ -45,7 +45,6 @@ export default class LoginScreen extends Component {
       });
   };
 
-
   render() {
     if (this.state.fontsLoaded) {
       SplashScreen.hideAsync();
@@ -79,11 +78,18 @@ export default class LoginScreen extends Component {
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={[styles.button, { marginTop: 20 }]}
+            onPress={() => this.props.navigation.replace("Dashboard")}
+          >
+            <Text style={styles.buttonText}>LoginDireto</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             onPress={() => this.props.navigation.navigate("RegisterScreen")}
           >
             <Text style={styles.buttonTextNewUser}>Usuário novo?</Text>
           </TouchableOpacity>
-          
+
         </KeyboardAvoidingView>
       );
     }
