@@ -4,6 +4,7 @@ import *as Font from "expo-font"
 import *as SplashScreen from "expo-splash-screen"
 import { RFValue } from "react-native-responsive-fontsize";
 import DropDownPicker from "react-native-dropdown-picker";
+import firebase from "firebase";
 
 SplashScreen.preventAutoHideAsync()
 
@@ -18,6 +19,7 @@ export default class CreateStory extends Component {
       fontsLoaded: false,
       previewImage: "Image_1",
       dropDownHeight: 40,
+      light_theme:true,
     }
   }
 
@@ -25,9 +27,23 @@ export default class CreateStory extends Component {
     await Font.loadAsync(customFonts);
     this.setState({ fontsLoaded: true });
   }
-
+  
   componentDidMount() {
     this._loadFontsAsync();
+    this.fetchUser();
+  }
+  
+  async fetchUser() {
+    let theme;
+    await firebase
+      .database()
+      .ref("/users/" + firebase.auth().currentUser.uid)
+      .on("value", function (snapshot) {
+        theme = snapshot.val().current_theme;
+      });
+    this.setState({
+      light_theme: theme === "light" ? true : false,
+    });
   }
 
   render() {
@@ -41,7 +57,7 @@ export default class CreateStory extends Component {
         Image_5: require("../assets/story_image_5.png"),
       }
       return (
-        <View style={styles.container}>
+        <View style={this.state.light_theme ? styles.containerLight : styles.container}>
           <SafeAreaView style={styles.droidSafeArea} />
           <View style={styles.appTitle}>
             <View style={styles.appIcon}>
@@ -51,7 +67,7 @@ export default class CreateStory extends Component {
               ></Image>
             </View>
             <View style={styles.appTitleTextContainer}>
-              <Text style={styles.appTitleText}>Create Story</Text>
+              <Text style={this.state.light_theme ? styles.appTitleTextLight : styles.appTitleText}>Create Story</Text>
             </View>
           </View>
           <View style={styles.fieldsContainer}>
@@ -85,7 +101,7 @@ export default class CreateStory extends Component {
             </View>
             <ScrollView>
               <TextInput
-                style={styles.inputFont}
+                style={this.state.light_theme ? styles.inputFontLight :styles.inputFont}
                 onChangeText={(title) => this.setState({ title })}
                 placeholder={"Title"}
                 placeholderTextColor="white"
@@ -93,7 +109,7 @@ export default class CreateStory extends Component {
 
               <TextInput
                 style={[
-                  styles.inputFont,
+                  this.state.light_theme ? styles.inputFontLight :styles.inputFont,
                   styles.inputFontExtra,
                   styles.inputTextBig,
                 ]}
@@ -105,7 +121,7 @@ export default class CreateStory extends Component {
               />
               <TextInput
                 style={[
-                  styles.inputFont,
+                  this.state.light_theme ? styles.inputFontLight :styles.inputFont,
                   styles.inputFontExtra,
                   styles.inputTextBig,
                 ]}
@@ -117,7 +133,7 @@ export default class CreateStory extends Component {
               />
               <TextInput
                 style={[
-                  styles.inputFont,
+                  this.state.light_theme ? styles.inputFontLight :styles.inputFont,
                   styles.inputFontExtra,
                   styles.inputTextBig,
                 ]}
@@ -138,37 +154,45 @@ export default class CreateStory extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#15193c",
+    backgroundColor: "#15193c"
+  },
+  containerLight: {
+    flex: 1,
+    backgroundColor: "white"
   },
   droidSafeArea: {
-    marginTop:
-      Platform.OS === "android" ? StatusBar.currentHeight : RFValue(35),
+    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : RFValue(35)
   },
   appTitle: {
     flex: 0.07,
-    flexDirection: "row",
+    flexDirection: "row"
   },
   appIcon: {
     flex: 0.3,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   iconImage: {
     width: "100%",
     height: "100%",
-    resizeMode: "contain",
+    resizeMode: "contain"
   },
   appTitleTextContainer: {
     flex: 0.7,
-    justifyContent: "center",
+    justifyContent: "center"
   },
   appTitleText: {
     color: "white",
     fontSize: RFValue(28),
-    fontFamily: "Bubblegum-Sans",
+    fontFamily: "Bubblegum-Sans"
+  },
+  appTitleTextLight: {
+    color: "black",
+    fontSize: RFValue(28),
+    fontFamily: "Bubblegum-Sans"
   },
   fieldsContainer: {
-    flex: 0.85,
+    flex: 0.85
   },
   previewImage: {
     width: "93%",
@@ -176,7 +200,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderRadius: RFValue(10),
     marginVertical: RFValue(10),
-    resizeMode: "contain",
+    resizeMode: "contain"
   },
   inputFont: {
     height: RFValue(40),
@@ -185,14 +209,33 @@ const styles = StyleSheet.create({
     borderRadius: RFValue(10),
     paddingLeft: RFValue(10),
     color: "white",
-    marginTop: RFValue(10),
-    fontFamily: "Bubblegum-Sans",
+    fontFamily: "Bubblegum-Sans"
+  },
+  inputFontLight: {
+    height: RFValue(40),
+    borderColor: "black",
+    borderWidth: RFValue(1),
+    borderRadius: RFValue(10),
+    paddingLeft: RFValue(10),
+    color: "black",
+    fontFamily: "Bubblegum-Sans"
+  },
+  dropdownLabel: {
+    color: "white",
+    fontFamily: "Bubblegum-Sans"
+  },
+  dropdownLabelLight: {
+    color: "black",
+    fontFamily: "Bubblegum-Sans"
   },
   inputFontExtra: {
-    marginTop: RFValue(15),
+    marginTop: RFValue(15)
   },
   inputTextBig: {
     textAlignVertical: "top",
-    padding: RFValue(5),
-  },
+    padding: RFValue(5)
+  }
 });
+
+
+
