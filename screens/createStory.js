@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, Image, StatusBar, Platform, SafeAreaView, ScrollView, TextInput } from "react-native"
+import { Text, View, StyleSheet, Image, StatusBar, Platform, SafeAreaView, ScrollView, TextInput, Button, Alert } from "react-native"
 import *as Font from "expo-font"
 import *as SplashScreen from "expo-splash-screen"
 import { RFValue } from "react-native-responsive-fontsize";
@@ -19,7 +19,7 @@ export default class CreateStory extends Component {
       fontsLoaded: false,
       previewImage: "Image_1",
       dropDownHeight: 40,
-      light_theme:true,
+      light_theme: true,
     }
   }
 
@@ -27,12 +27,12 @@ export default class CreateStory extends Component {
     await Font.loadAsync(customFonts);
     this.setState({ fontsLoaded: true });
   }
-  
+
   componentDidMount() {
     this._loadFontsAsync();
     this.fetchUser();
   }
-  
+
   async fetchUser() {
     let theme;
     await firebase
@@ -44,6 +44,46 @@ export default class CreateStory extends Component {
     this.setState({
       light_theme: theme === "light" ? true : false,
     });
+  }
+
+  async addStory() {
+    if (
+      this.state.title &&
+      this.state.description &&
+      this.state.story &&
+      this.state.moral
+    ) {
+      let storyData = {
+        preview_image: this.state.previewImage,
+        title: this.state.title,
+        description: this.state.description,
+        story: this.state.story,
+        moral: this.state.moral,
+        author: firebase.auth().currentUser.displayName,
+        created_on: new Date(),
+        author_uid: firebase.auth().currentUser.uid,
+        likes: 0
+      };
+      await firebase
+        .database()
+        .ref(
+          "/posts/" +
+          Math.random()
+            .toString(36)
+            .slice(2)
+        )
+        .set(storyData)
+        .then(function (snapshot) { });
+      this.props.setUpdateToTrue();
+      this.props.navigation.navigate("Feed");
+    } else {
+      Alert.alert(
+        "Error",
+        "Todos os campos são obrigatórios!",
+        [{ text: "OK", onPress: () => console.log("OK Pressionado") }],
+        { cancelable: false }
+      );
+    }
   }
 
   render() {
@@ -101,7 +141,7 @@ export default class CreateStory extends Component {
             </View>
             <ScrollView>
               <TextInput
-                style={this.state.light_theme ? styles.inputFontLight :styles.inputFont}
+                style={this.state.light_theme ? styles.inputFontLight : styles.inputFont}
                 onChangeText={(title) => this.setState({ title })}
                 placeholder={"Title"}
                 placeholderTextColor="white"
@@ -109,7 +149,7 @@ export default class CreateStory extends Component {
 
               <TextInput
                 style={[
-                  this.state.light_theme ? styles.inputFontLight :styles.inputFont,
+                  this.state.light_theme ? styles.inputFontLight : styles.inputFont,
                   styles.inputFontExtra,
                   styles.inputTextBig,
                 ]}
@@ -121,7 +161,7 @@ export default class CreateStory extends Component {
               />
               <TextInput
                 style={[
-                  this.state.light_theme ? styles.inputFontLight :styles.inputFont,
+                  this.state.light_theme ? styles.inputFontLight : styles.inputFont,
                   styles.inputFontExtra,
                   styles.inputTextBig,
                 ]}
@@ -133,7 +173,7 @@ export default class CreateStory extends Component {
               />
               <TextInput
                 style={[
-                  this.state.light_theme ? styles.inputFontLight :styles.inputFont,
+                  this.state.light_theme ? styles.inputFontLight : styles.inputFont,
                   styles.inputFontExtra,
                   styles.inputTextBig,
                 ]}
@@ -143,9 +183,16 @@ export default class CreateStory extends Component {
                 numberOfLines={4}
                 placeholderTextColor="white"
               />
+              <View style={styles.submitButton}>
+                <Button
+                  onPress={() => this.addStory()}
+                  title="Submit"
+                  color="#841584"
+                />
+              </View>
             </ScrollView>
           </View>
-        </View>
+        </View >
       );
     }
   }
@@ -234,8 +281,12 @@ const styles = StyleSheet.create({
   inputTextBig: {
     textAlignVertical: "top",
     padding: RFValue(5)
+  },
+  submitButton: {
+    marginTop: RFValue(20),
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
-
 
 

@@ -3512,10 +3512,10 @@ expo-modules-core@1.1.1:
     compare-versions "^3.4.0"
     invariant "^2.2.4"
 
-expo-speech@^11.1.1:
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/expo-speech/-/expo-speech-11.1.1.tgz#4370a7a5d4a6537a182c97fadc2628e933f79e45"
-  integrity sha512-JiyZmmNci7vIXZA/XLZ7x64jIvT/v/TOc5Y/nTBzo6Aqc3+YnYk3VoR+QDVQzeFRR6MW72FZyOvhvlFbfGRzTQ==
+expo-speech@~11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/expo-speech/-/expo-speech-11.0.0.tgz#334f06ac4422866b38eef4854dfecac7c3507c5e"
+  integrity sha512-C5/uFQ/hBHp0JAXf8nEgGLpzdstnRjKLZRpgT5ULIa+Tg634EU4he2x/PQ2QpX6qRdQfE3yUKjdrb5ly/b5IAA==
 
 expo-splash-screen@~0.17.0, expo-splash-screen@~0.17.5:
   version "0.17.5"

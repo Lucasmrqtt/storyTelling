@@ -29,7 +29,7 @@ const StackNav = () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <StackNav />
+      <StackNav/>
     </NavigationContainer>
   );
 }

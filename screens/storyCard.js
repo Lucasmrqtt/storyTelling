@@ -17,7 +17,9 @@ export default class StoryCard extends Component {
     super(props)
     this.state = {
       fontsLoaded: false,
-      light_theme:true
+      light_theme: true,
+      storyID: this.props.story.key,
+      storyData: this.props.story.value,
     }
   }
 
@@ -25,12 +27,12 @@ export default class StoryCard extends Component {
     await Font.loadAsync(customFonts);
     this.setState({ fontsLoaded: true });
   }
-  
+
   componentDidMount() {
     this._loadFontsAsync();
     this.fetchUser();
   }
-  
+
   async fetchUser() {
     let theme;
     await firebase
@@ -45,35 +47,43 @@ export default class StoryCard extends Component {
   }
 
   render() {
+    let story = this.state.storyData
     if (this.state.fontsLoaded) {
       SplashScreen.hideAsync();
+      let images = {
+        image_1: require("../assets/story_image_1.png"),
+        image_2: require("../assets/story_image_2.png"),
+        image_3: require("../assets/story_image_3.png"),
+        image_4: require("../assets/story_image_4.png"),
+        image_5: require("../assets/story_image_5.png")
+      };
       return (
-        <TouchableOpacity style={this.state.light_theme ? styles.cardContainerLight : styles.cardContainer}
+        <TouchableOpacity style={styles.container}
           onPress={() => {
             this.props.navigation.navigate("StoryScreen",
               { story: this.props.story })
           }}>
-          <View style={styles.cardContainer}>
+          <View style={this.state.light_theme ? styles.cardContainerLight : styles.cardContainer}>
             <Image
-              source={require("../assets/story_image_1.png")}
+              source={images[story.preview_image]}
               style={styles.storyImage}
             ></Image>
 
             <View style={styles.titleContainer}>
               <Text style={this.state.light_theme ? styles.storyTitleTextLight : styles.storyTitleText}>
-                {this.props.story.title}
+                {story.title}
               </Text>
-              <Text style={this.state.light_theme ? styles.storyAuthorTextLight  : styles.storyAuthorText}>
-                {this.props.story.author}
+              <Text style={this.state.light_theme ? styles.storyAuthorTextLight : styles.storyAuthorText}>
+                {story.author}
               </Text>
-              <Text style={this.state.light_theme ? styles.descriptionTextLight  : styles.descriptionText}>
-                {this.props.story.description}
+              <Text style={this.state.light_theme ? styles.descriptionTextLight : styles.descriptionText}>
+                {story.description}
               </Text>
             </View>
             <View style={styles.actionContainer}>
               <View style={styles.likeButton}>
                 <Ionicons name={"heart"} size={RFValue(30)} color={"white"} />
-                <Text style={this.state.light_theme ? styles.likeTextLight  : styles.likeText}>12k</Text>
+                <Text style={this.state.light_theme ? styles.likeTextLight : styles.likeText}>{story.like}</Text>
               </View>
             </View>
           </View>
@@ -82,7 +92,6 @@ export default class StoryCard extends Component {
     }
   }
 }
-
 
 const styles = StyleSheet.create({
   droidSafeArea: {

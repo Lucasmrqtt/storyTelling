@@ -21,7 +21,8 @@ export default class Feed extends Component {
     super(props)
     this.state = {
       fontsLoaded: false,
-      light_theme:true
+      light_theme:true,
+      stories:[]
     }
   }
 
@@ -33,6 +34,7 @@ export default class Feed extends Component {
   componentDidMount() {
     this._loadFontsAsync();
     this.fetchUser();
+    this.fetchStories();
   }
 
   async fetchUser() {
@@ -47,6 +49,31 @@ export default class Feed extends Component {
       light_theme: theme === "light" ? true : false,
     });
   }
+
+  fetchStories = () => {
+    firebase
+      .database()
+      .ref("/posts/")
+      .on(
+        "value",
+        snapshot => {
+          let stories = [];
+          if (snapshot.val()) {
+            Object.keys(snapshot.val()).forEach(function (key) {
+              stories.push({
+                key: key,
+                value: snapshot.val()[key]
+              });
+            });
+          }
+          this.setState({ stories: stories });
+          this.props.setUpdateToFalse();
+        },
+        function (errorObject) {
+          console.log("A leitura falhou: " + errorObject.code);
+        }
+      );
+  };
 
   renderItem = ({ item: story }) => {
     return <StoryCard story={story} navigation={this.props.navigation}/>;
@@ -68,16 +95,30 @@ export default class Feed extends Component {
               ></Image>
             </View>
             <View style={styles.appTitleTextContainer}>
-              <Text style={this.state.light_theme ?styles.appTitleTextLight :styles.appTitleText}>Story Telling</Text>
+              <Text style={this.state.light_theme ? styles.appTitleTextLight : styles.appTitleText}>Story Telling</Text>
             </View>
           </View>
-          <View style={styles.cardContainer}>
-            <FlatList
-              keyExtractor={this.keyExtractor}
-              data={stories}
-              renderItem={this.renderItem}
-            />
-          </View>
+          {!this.state.stories[0] ? (
+            <View style={styles.noStories}>
+              <Text
+                style={
+                  this.state.light_theme
+                    ? styles.noStoriesTextLight
+                    : styles.noStoriesText
+                }
+              >
+                Nenhuma História Disponível
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.cardContainer}>
+              <FlatList
+                keyExtractor={this.keyExtractor}
+                data={this.state.stories}
+                renderItem={this.renderItem}
+              />
+            </View>
+          )}
         </View>
       );
     }
@@ -126,5 +167,19 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 0.85
+  },
+  noStories: {
+    flex: 0.85,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  noStoriesTextLight: {
+    fontSize: RFValue(40),
+    fontFamily: "Bubblegum-Sans"
+  },
+  noStoriesText: {
+    color: "white",
+    fontSize: RFValue(40),
+    fontFamily: "Bubblegum-Sans"
   }
 });
