@@ -20,6 +20,28 @@ export default class StoryCard extends Component {
       light_theme: true,
       storyID: this.props.story.key,
       storyData: this.props.story.value,
+      likes: this.props.story.value.likes,
+      is_liked: false
+    }
+  }
+
+  likeAction = () => {
+    if (this.state.is_liked) {
+      firebase
+        .database()
+        .ref("posts")
+        .child(this.state.storyID)
+        .child("likes")
+        .set(firebase.database.ServerValue.increment(-1));
+      this.setState({ likes: (this.state.likes -= 1), is_liked: false });
+    } else {
+      firebase
+        .database()
+        .ref("posts")
+        .child(this.state.storyID)
+        .child("likes")
+        .set(firebase.database.ServerValue.increment(1));
+      this.setState({ likes: (this.state.likes += 1), is_liked: true });
     }
   }
 
@@ -61,7 +83,7 @@ export default class StoryCard extends Component {
         <TouchableOpacity style={styles.container}
           onPress={() => {
             this.props.navigation.navigate("StoryScreen",
-              { story: this.props.story })
+              { story: this.props.story.value, storyID: this.state.storyID, storyLikes:this.state.likes, is_liked:this.state.is_liked })
           }}>
           <View style={this.state.light_theme ? styles.cardContainerLight : styles.cardContainer}>
             <Image
@@ -81,10 +103,30 @@ export default class StoryCard extends Component {
               </Text>
             </View>
             <View style={styles.actionContainer}>
-              <View style={styles.likeButton}>
-                <Ionicons name={"heart"} size={RFValue(30)} color={"white"} />
-                <Text style={this.state.light_theme ? styles.likeTextLight : styles.likeText}>{story.like}</Text>
-              </View>
+              <TouchableOpacity
+                style={
+                  this.state.is_liked
+                    ? styles.likeButtonLiked
+                    : styles.likeButtonDisliked
+                }
+                onPress={() => this.likeAction()}
+              >
+                <Ionicons
+                  name={"heart"}
+                  size={RFValue(30)}
+                  color={this.state.light_theme ? "black" : "white"}
+                />
+
+                <Text
+                  style={
+                    this.state.light_theme
+                      ? styles.likeTextLight
+                      : styles.likeText
+                  }
+                >
+                  {this.state.likes}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableOpacity>
@@ -170,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: RFValue(10)
   },
-  likeButton: {
+  likeButtonLiked: {
     width: RFValue(160),
     height: RFValue(40),
     justifyContent: "center",
@@ -179,15 +221,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#eb3948",
     borderRadius: RFValue(30)
   },
+  likeButtonDisliked: {
+    width: RFValue(160),
+    height: RFValue(40),
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    borderColor: "#eb3948",
+    borderWidth: 2,
+    borderRadius: RFValue(30)
+  },
   likeText: {
     color: "white",
     fontFamily: "Bubblegum-Sans",
-    fontSize: RFValue(25),
-    marginLeft: RFValue(5)
+    fontSize: 25,
+    marginLeft: 25,
+    marginTop: 6
   },
   likeTextLight: {
     fontFamily: "Bubblegum-Sans",
-    fontSize: RFValue(25),
-    marginLeft: RFValue(5)
+    fontSize: 25,
+    marginLeft: 25,
+    marginTop: 6
   }
 });
+
+//Marquettilu@gmail.com

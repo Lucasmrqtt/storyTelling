@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, SafeAreaView, Platform, StatusBar, Image, ScrollView, Dimensions} from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, Platform, StatusBar, Image, ScrollView, Dimensions } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -21,21 +21,23 @@ export default class StoryScreen extends Component {
       fontsLoaded: false,
       speakerColor: "gray",
       speakerIcon: "volume-high-outline",
-      light_theme:true,
+      light_theme: true,
+      likes: this.props.route.params.storyLikes,
+      is_liked: this.props.route.params.is_liked,
+      storyID:this.props.route.params.storyID
     }
-    
   }
 
   async _loadFontsAsync() {
     await Font.loadAsync(customFonts);
     this.setState({ fontsLoaded: true });
   }
-  
+
   componentDidMount() {
     this._loadFontsAsync();
     this.fetchUser();
   }
-  
+
   async fetchUser() {
     let theme;
     await firebase
@@ -64,11 +66,31 @@ export default class StoryScreen extends Component {
     }
   }
 
-  render(){
+  likeAction = () => {
+    if (this.state.is_liked) {
+      firebase
+        .database()
+        .ref("posts")
+        .child(this.state.storyID)
+        .child("likes")
+        .set(firebase.database.ServerValue.increment(-1));
+      this.setState({ likes: (this.state.likes -= 1), is_liked: false });
+    } else {
+      firebase
+        .database()
+        .ref("posts")
+        .child(this.state.storyID)
+        .child("likes")
+        .set(firebase.database.ServerValue.increment(1));
+      this.setState({ likes: (this.state.likes += 1), is_liked: true });
+    }
+  }
+
+  render() {
     if (this.state.fontsLoaded) {
       SplashScreen.hideAsync();
-      return(
-        <View style={this.state.light_theme ? styles.containerLight  : styles.container}>
+      return (
+        <View style={this.state.light_theme ? styles.containerLight : styles.container}>
           <SafeAreaView style={styles.droidSafeArea} />
           <View style={styles.appTitle}>
             <View style={styles.appIcon}>
@@ -78,11 +100,11 @@ export default class StoryScreen extends Component {
               ></Image>
             </View>
             <View style={styles.appTitleTextContainer}>
-              <Text style={this.state.light_theme ? styles.appTitleTextLight  : styles.appTitleText}>Storytelling App</Text>
+              <Text style={this.state.light_theme ? styles.appTitleTextLight : styles.appTitleText}>Storytelling App</Text>
             </View>
           </View>
           <View style={styles.storyContainer}>
-            <ScrollView style={this.state.light_theme ? styles.storyCardLight  : styles.storyCard}>
+            <ScrollView style={this.state.light_theme ? styles.storyCardLight : styles.storyCard}>
               <Image
                 source={require("../assets/story_image_2.png")}
                 style={styles.image}
@@ -90,13 +112,13 @@ export default class StoryScreen extends Component {
 
               <View style={styles.dataContainer}>
                 <View style={styles.titleTextContainer}>
-                  <Text style={this.state.light_theme ? styles.storyTitleTextLight  : styles.storyTitleText}>
+                  <Text style={this.state.light_theme ? styles.storyTitleTextLight : styles.storyTitleText}>
                     {this.props.route.params.story.title}
                   </Text>
-                  <Text style={this.state.light_theme ? styles.storyAuthorTextLight  : styles.storyAuthorText}>
+                  <Text style={this.state.light_theme ? styles.storyAuthorTextLight : styles.storyAuthorText}>
                     {this.props.route.params.story.author}
                   </Text>
-                  <Text style={this.state.light_theme ? styles.storyAuthorTextLight  : styles.storyAuthorText}>
+                  <Text style={this.state.light_theme ? styles.storyAuthorTextLight : styles.storyAuthorText}>
                     {this.props.route.params.story.created_on}
                   </Text>
                 </View>
@@ -121,24 +143,44 @@ export default class StoryScreen extends Component {
                 </View>
               </View>
               <View style={styles.storyTextContainer}>
-                <Text style={this.state.light_theme ? styles.storyTextLight  : styles.storyText}>
+                <Text style={this.state.light_theme ? styles.storyTextLight : styles.storyText}>
                   {this.props.route.params.story.story}
                 </Text>
-                <Text style={this.state.light_theme ? styles.moralTextLight  : styles.moralText}>
+                <Text style={this.state.light_theme ? styles.moralTextLight : styles.moralText}>
                   Moral - {this.props.route.params.story.moral}
                 </Text>
               </View>
               <View style={styles.actionContainer}>
-                <View style={styles.likeButton}>
-                  <Ionicons name={"heart"} size={RFValue(30)} color={"white"} />
-                  <Text style={this.state.light_theme ? styles.likeTextLight  : styles.likeText}>12k</Text>
-                </View>
+                <TouchableOpacity
+                  style={
+                    this.state.is_liked
+                      ? styles.likeButtonLiked
+                      : styles.likeButtonDisliked
+                  }
+                  onPress={() => this.likeAction()}
+                >
+                  <Ionicons
+                    name={"heart"}
+                    size={RFValue(30)}
+                    color={this.state.light_theme ? "black" : "white"}
+                  />
+
+                  <Text
+                    style={
+                      this.state.light_theme
+                        ? styles.likeTextLight
+                        : styles.likeText
+                    }
+                  >
+                    {this.state.likes}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </ScrollView>
           </View>
         </View>
       )
-    } 
+    }
   }
 }
 
@@ -269,14 +311,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: RFValue(10)
   },
-  likeButton: {
+  likeButtonLiked: {
+    flexDirection: "row",
     width: RFValue(160),
     height: RFValue(40),
-    flexDirection: "row",
-    backgroundColor: "#eb3948",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#eb3948",
     borderRadius: RFValue(30)
+  },
+  likeButtonDisliked: {
+    flexDirection: "row",
+    width: RFValue(160),
+    height: RFValue(40),
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "#eb3948",
+    borderRadius: RFValue(30),
+    borderWidth: 2
   },
   likeText: {
     color: "white",
@@ -290,3 +342,5 @@ const styles = StyleSheet.create({
     marginLeft: RFValue(5)
   }
 });
+
+//Marquettilu@gmail.com
